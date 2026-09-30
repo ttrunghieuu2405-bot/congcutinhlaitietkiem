@@ -12,7 +12,7 @@ st.set_page_config(
 # =========================
 # TIÊU ĐỀ
 # =========================
-st.title("💰 ỨNG DỤNG TÍNH LÃI GỬI TIẾT KIỆM")
+st.title("💰 CHÔNG VỢ HÀI ĐẾN TỪ CHÂU ÂU ")
 
 st.write(
     "Ứng dụng hỗ trợ tính tiền lãi gửi tiết kiệm theo "
