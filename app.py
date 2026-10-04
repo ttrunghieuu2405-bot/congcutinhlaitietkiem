@@ -256,3 +256,19 @@ from datetime import date
 import streamlit as st
 import math
 from itertools import combinations
+# code phần tính lãi phía trên
+# ...
+
+# ============================================================
+# 🛒 GIỎ HÀNG MỤC TIÊU
+# ============================================================
+
+from itertools import combinations
+
+st.markdown("---")
+st.header("🛒 Giỏ hàng mục tiêu")
+
+st.write(
+    "Hãy biến tiền lãi tiết kiệm thành những mục tiêu thực tế "
+    "mà bạn muốn đạt được."
+)
