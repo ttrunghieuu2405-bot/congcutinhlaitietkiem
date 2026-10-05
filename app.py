@@ -1,5 +1,5 @@
 import streamlit as st
-
+st.image("logo.jpg")
 # =========================
 # CẤU HÌNH TRANG
 # =========================
@@ -12,7 +12,7 @@ st.set_page_config(
 # =========================
 # TIÊU ĐỀ
 # =========================
-st.title("💰 ỨNG DỤNG TÍNH LÃI GỬI TIẾT KIỆM")
+st.title("💰 CHÔNG VỢ HÀI ĐẾN TỪ CHÂU ÂU _ TRẦN TRUNG HIẾU ")
 
 st.write(
     "Ứng dụng hỗ trợ tính tiền lãi gửi tiết kiệm theo "
@@ -250,3 +250,9 @@ st.caption(
     "Lưu ý: Kết quả mang tính tham khảo. "
     "Cách tính thực tế có thể khác tùy quy định của từng ngân hàng."
 )
+import streamlit as st
+from datetime import date
+
+import streamlit as st
+import math
+from itertools import combinations
