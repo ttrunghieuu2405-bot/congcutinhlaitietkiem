@@ -256,3 +256,695 @@ from datetime import date
 import streamlit as st
 import math
 from itertools import combinations
+import streamlit as st
+from itertools import combinations
+
+# ============================================================
+# CẤU HÌNH TRANG
+# ============================================================
+
+st.set_page_config(
+    page_title="Giỏ hàng mục tiêu",
+    page_icon="🛒",
+    layout="centered"
+)
+
+# ============================================================
+# HÀM ĐỊNH DẠNG TIỀN
+# ============================================================
+
+def dinh_dang_tien(so_tien):
+    return f"{so_tien:,.0f} VNĐ".replace(",", ".")
+
+
+# ============================================================
+# TIÊU ĐỀ
+# ============================================================
+
+st.title("🛒 GIỎ HÀNG MỤC TIÊU")
+
+st.write(
+    "Hãy xem **tiền lãi tiết kiệm** của bạn có thể "
+    "giúp bạn thực hiện được những mục tiêu nào."
+)
+
+st.divider()
+
+
+# ============================================================
+# 1. NHẬP SỐ TIỀN LÃI
+# ============================================================
+
+st.subheader("💰 Tiền lãi của bạn")
+
+tien_lai = st.number_input(
+    "Nhập tổng tiền lãi dự kiến (VNĐ)",
+    min_value=0,
+    value=30_000_000,
+    step=1_000_000,
+    format="%d"
+)
+
+st.metric(
+    "💰 Ngân sách từ tiền lãi",
+    dinh_dang_tien(tien_lai)
+)
+
+st.caption(
+    "Giỏ hàng sẽ sử dụng số tiền lãi này làm ngân sách "
+    "để đánh giá khả năng đạt các mục tiêu."
+)
+
+
+# ============================================================
+# 2. DANH SÁCH MỤC TIÊU GỢI Ý
+# ============================================================
+
+DANH_SACH_MUC_TIEU = {
+
+    "📱 Công nghệ": {
+        "📱 Điện thoại": 25_000_000,
+        "💻 Laptop": 20_000_000,
+        "📱 Máy tính bảng": 15_000_000,
+        "⌚ Đồng hồ thông minh": 8_000_000,
+        "🎧 Tai nghe": 5_000_000
+    },
+
+    "✈️ Du lịch": {
+        "🇯🇵 Du lịch Nhật Bản": 30_000_000,
+        "🇰🇷 Du lịch Hàn Quốc": 25_000_000,
+        "🇹🇭 Du lịch Thái Lan": 12_000_000,
+        "🏖️ Du lịch Phú Quốc": 10_000_000,
+        "⛰️ Du lịch Đà Lạt": 5_000_000
+    },
+
+    "🎓 Học tập": {
+        "📚 Khóa học ngoại ngữ": 10_000_000,
+        "🎓 Học phí một học kỳ": 20_000_000,
+        "💻 Khóa học công nghệ": 8_000_000,
+        "📝 Lệ phí thi chứng chỉ": 5_000_000
+    },
+
+    "🏠 Gia đình": {
+        "📺 TV": 15_000_000,
+        "🧊 Tủ lạnh": 12_000_000,
+        "🧺 Máy giặt": 10_000_000,
+        "🤖 Robot hút bụi": 8_000_000,
+        "🛋️ Nội thất": 20_000_000
+    },
+
+    "🎁 Cá nhân": {
+        "🏍️ Xe máy": 40_000_000,
+        "📷 Máy ảnh": 20_000_000,
+        "🎸 Nhạc cụ": 10_000_000,
+        "👟 Mua sắm cá nhân": 5_000_000,
+        "🎁 Quà tặng": 3_000_000
+    }
+}
+
+
+# ============================================================
+# 3. KHỞI TẠO GIỎ HÀNG
+# ============================================================
+
+if "gio_hang" not in st.session_state:
+    st.session_state.gio_hang = []
+
+
+# ============================================================
+# 4. THÊM MỤC TIÊU
+# ============================================================
+
+st.divider()
+st.subheader("🎯 Thêm mục tiêu")
+
+tab1, tab2 = st.tabs(
+    [
+        "✨ Mục tiêu gợi ý",
+        "✍️ Tự tạo mục tiêu"
+    ]
+)
+
+
+# ============================================================
+# TAB 1 - MỤC TIÊU GỢI Ý
+# ============================================================
+
+with tab1:
+
+    nhom = st.selectbox(
+        "📂 Chọn nhóm",
+        list(DANH_SACH_MUC_TIEU.keys())
+    )
+
+    muc_tieu = st.selectbox(
+        "🎯 Chọn mục tiêu",
+        list(DANH_SACH_MUC_TIEU[nhom].keys())
+    )
+
+    gia_goi_y = DANH_SACH_MUC_TIEU[nhom][muc_tieu]
+
+    gia = st.number_input(
+        "💵 Giá mục tiêu (VNĐ)",
+        min_value=1_000,
+        value=int(gia_goi_y),
+        step=100_000,
+        format="%d",
+        key="gia_goi_y"
+    )
+
+    st.caption(
+        "💡 Giá trên chỉ mang tính minh họa. "
+        "Bạn có thể thay đổi theo giá thực tế."
+    )
+
+    if st.button(
+        "➕ THÊM VÀO GIỎ HÀNG",
+        type="primary",
+        use_container_width=True
+    ):
+
+        st.session_state.gio_hang.append(
+            {
+                "ten": muc_tieu,
+                "gia": gia,
+                "nhom": nhom
+            }
+        )
+
+        st.rerun()
+
+
+# ============================================================
+# TAB 2 - TỰ TẠO MỤC TIÊU
+# ============================================================
+
+with tab2:
+
+    ten_muc_tieu = st.text_input(
+        "🎯 Tên mục tiêu",
+        placeholder="Ví dụ: Mua xe máy mới"
+    )
+
+    gia_tu_tao = st.number_input(
+        "💵 Giá mục tiêu (VNĐ)",
+        min_value=0,
+        value=10_000_000,
+        step=500_000,
+        format="%d",
+        key="gia_tu_tao"
+    )
+
+    nhom_tu_tao = st.selectbox(
+        "📂 Nhóm mục tiêu",
+        [
+            "📱 Công nghệ",
+            "✈️ Du lịch",
+            "🎓 Học tập",
+            "🏠 Gia đình",
+            "🎁 Cá nhân",
+            "⭐ Khác"
+        ],
+        key="nhom_tu_tao"
+    )
+
+    if st.button(
+        "➕ THÊM MỤC TIÊU CỦA TÔI",
+        type="primary",
+        use_container_width=True
+    ):
+
+        if ten_muc_tieu.strip() == "":
+
+            st.warning(
+                "⚠️ Vui lòng nhập tên mục tiêu."
+            )
+
+        elif gia_tu_tao <= 0:
+
+            st.warning(
+                "⚠️ Giá mục tiêu phải lớn hơn 0."
+            )
+
+        else:
+
+            st.session_state.gio_hang.append(
+                {
+                    "ten": ten_muc_tieu.strip(),
+                    "gia": gia_tu_tao,
+                    "nhom": nhom_tu_tao
+                }
+            )
+
+            st.rerun()
+
+
+# ============================================================
+# 5. GIỎ HÀNG
+# ============================================================
+
+st.divider()
+st.subheader("🛒 Giỏ hàng của tôi")
+
+gio_hang = st.session_state.gio_hang
+
+
+# ============================================================
+# GIỎ HÀNG TRỐNG
+# ============================================================
+
+if len(gio_hang) == 0:
+
+    st.info(
+        "🛒 Giỏ hàng đang trống. "
+        "Hãy thêm một hoặc nhiều mục tiêu ở phía trên."
+    )
+
+
+# ============================================================
+# CÓ SẢN PHẨM TRONG GIỎ
+# ============================================================
+
+else:
+
+    # --------------------------------------------------------
+    # Hiển thị từng mục tiêu
+    # --------------------------------------------------------
+
+    for i, item in enumerate(gio_hang):
+
+        col1, col2, col3 = st.columns(
+            [5, 2, 1]
+        )
+
+        with col1:
+
+            st.markdown(
+                f"**{item['ten']}**"
+            )
+
+            st.caption(
+                item["nhom"]
+            )
+
+        with col2:
+
+            st.write(
+                f"**{dinh_dang_tien(item['gia'])}**"
+            )
+
+        with col3:
+
+            if st.button(
+                "🗑️",
+                key=f"xoa_{i}"
+            ):
+
+                st.session_state.gio_hang.pop(i)
+
+                st.rerun()
+
+
+    # ========================================================
+    # 6. TÍNH TỔNG GIỎ HÀNG
+    # ========================================================
+
+    tong_gio_hang = sum(
+        item["gia"]
+        for item in gio_hang
+    )
+
+    chenh_lech = (
+        tien_lai
+        - tong_gio_hang
+    )
+
+
+    # ========================================================
+    # 7. TỔNG QUAN
+    # ========================================================
+
+    st.divider()
+    st.subheader("📊 Tổng quan")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+
+        st.metric(
+            "🛒 Tổng giỏ hàng",
+            dinh_dang_tien(tong_gio_hang)
+        )
+
+    with col2:
+
+        st.metric(
+            "💰 Tiền lãi",
+            dinh_dang_tien(tien_lai)
+        )
+
+    with col3:
+
+        if chenh_lech >= 0:
+
+            st.metric(
+                "💵 Còn dư",
+                dinh_dang_tien(chenh_lech)
+            )
+
+        else:
+
+            st.metric(
+                "📌 Còn thiếu",
+                dinh_dang_tien(
+                    abs(chenh_lech)
+                )
+            )
+
+
+    # ========================================================
+    # 8. TIẾN ĐỘ HOÀN THÀNH
+    # ========================================================
+
+    st.subheader("🎯 Tiến độ hoàn thành")
+
+    if tong_gio_hang > 0:
+
+        phan_tram = (
+            tien_lai
+            / tong_gio_hang
+            * 100
+        )
+
+    else:
+
+        phan_tram = 0
+
+    progress = min(
+        phan_tram / 100,
+        1.0
+    )
+
+    st.progress(progress)
+
+    st.markdown(
+        f"## {phan_tram:.1f}%"
+    )
+
+    if phan_tram < 100:
+
+        st.write(
+            f"Tiền lãi hiện tại đáp ứng được "
+            f"**{phan_tram:.1f}%** tổng giá trị giỏ hàng."
+        )
+
+    else:
+
+        st.write(
+            "🎉 Tiền lãi đã đủ để hoàn thành "
+            "toàn bộ giỏ hàng."
+        )
+
+
+    # ========================================================
+    # 9. ĐÁNH GIÁ GIỎ HÀNG
+    # ========================================================
+
+    if tien_lai >= tong_gio_hang:
+
+        tien_du = (
+            tien_lai
+            - tong_gio_hang
+        )
+
+        st.success(
+            f"""
+### 🎉 CHÚC MỪNG!
+
+Tiền lãi của bạn đủ để thực hiện
+**toàn bộ {len(gio_hang)} mục tiêu**.
+
+🛒 Tổng giá trị giỏ hàng:
+
+**{dinh_dang_tien(tong_gio_hang)}**
+
+💰 Tiền lãi hiện có:
+
+**{dinh_dang_tien(tien_lai)}**
+
+💵 Sau khi hoàn thành các mục tiêu,
+bạn vẫn còn:
+
+### {dinh_dang_tien(tien_du)}
+"""
+        )
+
+    else:
+
+        tien_thieu = (
+            tong_gio_hang
+            - tien_lai
+        )
+
+        st.warning(
+            f"""
+### 🔒 CHƯA ĐỦ NGÂN SÁCH
+
+Bạn đã đạt được
+**{phan_tram:.1f}%** tổng giá trị mục tiêu.
+
+Bạn còn thiếu:
+
+### {dinh_dang_tien(tien_thieu)}
+"""
+        )
+
+
+    # ========================================================
+    # 10. KHẢ NĂNG ĐẠT TỪNG MỤC TIÊU
+    # ========================================================
+
+    st.divider()
+    st.subheader("🔍 Khả năng đạt từng mục tiêu")
+
+    for item in gio_hang:
+
+        gia_item = item["gia"]
+
+        ty_le = (
+            tien_lai
+            / gia_item
+            * 100
+        )
+
+        if tien_lai >= gia_item:
+
+            tien_con_lai = (
+                tien_lai
+                - gia_item
+            )
+
+            st.success(
+                f"""
+✅ **{item['ten']}**
+
+💵 Giá:
+**{dinh_dang_tien(gia_item)}**
+
+🎯 Khả năng đáp ứng:
+**{ty_le:.0f}%**
+
+Nếu thực hiện riêng mục tiêu này,
+bạn còn **{dinh_dang_tien(tien_con_lai)}**.
+"""
+            )
+
+        else:
+
+            tien_con_thieu = (
+                gia_item
+                - tien_lai
+            )
+
+            st.info(
+                f"""
+🔒 **{item['ten']}**
+
+💵 Giá:
+**{dinh_dang_tien(gia_item)}**
+
+🎯 Tiến độ:
+**{ty_le:.1f}%**
+
+📌 Còn thiếu:
+**{dinh_dang_tien(tien_con_thieu)}**
+"""
+            )
+
+
+    # ========================================================
+    # 11. GỢI Ý TỔ HỢP MỤC TIÊU TỐT NHẤT
+    # ========================================================
+
+    st.divider()
+    st.subheader("💡 Gợi ý giỏ hàng phù hợp")
+
+    st.write(
+        "Ứng dụng tự tìm tổ hợp mục tiêu có tổng giá trị "
+        "gần nhất với tiền lãi hiện có mà không vượt ngân sách."
+    )
+
+    # Giới hạn 15 mục tiêu để tránh quá nhiều tổ hợp
+    danh_sach_tim = gio_hang[:15]
+
+    to_hop_tot_nhat = []
+    gia_tri_tot_nhat = 0
+
+
+    # --------------------------------------------------------
+    # Thử tất cả tổ hợp
+    # --------------------------------------------------------
+
+    for so_luong in range(
+        1,
+        len(danh_sach_tim) + 1
+    ):
+
+        for to_hop in combinations(
+            danh_sach_tim,
+            so_luong
+        ):
+
+            tong_to_hop = sum(
+                item["gia"]
+                for item in to_hop
+            )
+
+            if (
+                tong_to_hop <= tien_lai
+                and tong_to_hop > gia_tri_tot_nhat
+            ):
+
+                gia_tri_tot_nhat = tong_to_hop
+
+                to_hop_tot_nhat = to_hop
+
+
+    # ========================================================
+    # 12. HIỂN THỊ PHƯƠNG ÁN ĐỀ XUẤT
+    # ========================================================
+
+    if to_hop_tot_nhat:
+
+        st.markdown(
+            "### ✨ Với tiền lãi hiện tại, "
+            "bạn có thể thực hiện:"
+        )
+
+        for item in to_hop_tot_nhat:
+
+            st.write(
+                f"✅ **{item['ten']}** "
+                f"— {dinh_dang_tien(item['gia'])}"
+            )
+
+        tien_con_lai = (
+            tien_lai
+            - gia_tri_tot_nhat
+        )
+
+        if tien_lai > 0:
+
+            ty_le_su_dung = (
+                gia_tri_tot_nhat
+                / tien_lai
+                * 100
+            )
+
+        else:
+
+            ty_le_su_dung = 0
+
+        st.success(
+            f"""
+### 🛍️ Phương án đề xuất
+
+Tổng giá trị:
+
+**{dinh_dang_tien(gia_tri_tot_nhat)}**
+
+📊 Sử dụng:
+
+**{ty_le_su_dung:.1f}% tiền lãi**
+
+💵 Tiền lãi còn lại:
+
+### {dinh_dang_tien(tien_con_lai)}
+"""
+        )
+
+
+    # ========================================================
+    # KHÔNG ĐỦ CHO MỤC TIÊU NÀO
+    # ========================================================
+
+    else:
+
+        muc_tieu_re_nhat = min(
+            gio_hang,
+            key=lambda x: x["gia"]
+        )
+
+        tien_thieu = (
+            muc_tieu_re_nhat["gia"]
+            - tien_lai
+        )
+
+        st.warning(
+            f"""
+### 🎯 Mục tiêu gần nhất
+
+Tiền lãi hiện tại chưa đủ cho
+bất kỳ mục tiêu nào trong giỏ.
+
+Mục tiêu gần nhất:
+
+**{muc_tieu_re_nhat['ten']}**
+
+💵 Giá:
+
+**{dinh_dang_tien(muc_tieu_re_nhat['gia'])}**
+
+Bạn còn thiếu:
+
+### {dinh_dang_tien(tien_thieu)}
+"""
+        )
+
+
+    # ========================================================
+    # 13. XÓA TOÀN BỘ GIỎ HÀNG
+    # ========================================================
+
+    st.divider()
+
+    if st.button(
+        "🗑️ XÓA TOÀN BỘ GIỎ HÀNG",
+        use_container_width=True
+    ):
+
+        st.session_state.gio_hang = []
+
+        st.rerun()
+
+
+# ============================================================
+# GHI CHÚ
+# ============================================================
+
+st.divider()
+
+st.caption(
+    "💡 Giá các mục tiêu gợi ý chỉ mang tính minh họa. "
+    "Người dùng có thể thay đổi giá theo nhu cầu thực tế."
+)
